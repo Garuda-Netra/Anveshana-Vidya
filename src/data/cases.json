@@ -1,0 +1,889 @@
+[
+  {
+    "id": "ransomware-investigation",
+    "scenario": "A healthcare organization suffered a ransomware attack encrypting patient records and demanding Bitcoin payment. Network was immediately isolated. Determine attack vector, scope, and attribution.",
+    "artifacts": [
+      {
+        "type": "Encrypted Files",
+        "description": "3,842 .encrypted files across file servers with ransom note README.txt",
+        "location": "\\\\FileServer01\\Shares\\ (all subdirectories)"
+      },
+      {
+        "type": "Ransom Note",
+        "description": "Text file with Bitcoin wallet address and Tor onion link for payment portal",
+        "location": "Desktop of 47 user workstations and all network shares"
+      },
+      {
+        "type": "Firewall Logs",
+        "description": "Palo Alto firewall logs covering 72 hours before attack",
+        "location": "/var/log/pan/ (15GB compressed)"
+      },
+      {
+        "type": "Email Server Logs",
+        "description": "Exchange server logs showing inbound email traffic",
+        "location": "C:\\Program Files\\Microsoft\\Exchange Server\\V15\\Logging\\"
+      },
+      {
+        "type": "EDR Alerts",
+        "description": "CrowdStrike Falcon alerts flagging suspicious PowerShell activity",
+        "location": "CrowdStrike cloud console - 23 high-severity alerts"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Isolate affected systems and preserve memory dumps from patient zero workstation",
+        "tool": "FTK Imager / DumpIt",
+        "expectedResult": "Memory dump captured before shutdown. Live processes, network connections, and loaded DLLs preserved for analysis."
+      },
+      {
+        "step": 2,
+        "action": "Analyze email logs to identify phishing email that delivered initial payload",
+        "tool": "Log Parser / Splunk",
+        "expectedResult": "Identified malicious email sent to HR dept at 09:47 UTC with macro-enabled Excel attachment 'Invoice_2024.xlsm'. Email originated from spoofed sender address."
+      },
+      {
+        "step": 3,
+        "action": "Extract and analyze malicious attachment in sandbox environment",
+        "tool": "Any.run / Joe Sandbox",
+        "expectedResult": "Macro contained obfuscated PowerShell downloading Cobalt Strike beacon from 203.0.113.87. Beacon established C2 connection and downloaded ransomware payload."
+      },
+      {
+        "step": 4,
+        "action": "Review EDR telemetry for lateral movement and persistence mechanisms",
+        "tool": "CrowdStrike Falcon / Sysmon logs",
+        "expectedResult": "Attacker used PsExec to move laterally via compromised admin credentials. Created scheduled task 'WindowsUpdateCheck' for persistence. Credential dumping via Mimikatz detected."
+      },
+      {
+        "step": 5,
+        "action": "Analyze memory dump for encryption key artifacts and ransomware variant identification",
+        "tool": "Volatility",
+        "expectedResult": "Identified REvil/Sodinokibi ransomware variant. Encryption keys not recoverable from memory. Found file handles showing encryption started in C:\\Users\\ before spreading to network shares."
+      },
+      {
+        "step": 6,
+        "action": "Reconstruct timeline of attack from initial compromise to full encryption",
+        "tool": "Autopsy / Plaso",
+        "expectedResult": "Complete timeline: Email opened 09:47 → Macro execution 09:48 → C2 beacon 09:52 → Credential theft 10:15 → Lateral movement 10:30 → Encryption began 11:20 → Completed 11:47."
+      },
+      {
+        "step": 7,
+        "action": "Identify scope of compromise and data exfiltration attempts",
+        "tool": "Wireshark / Network logs",
+        "expectedResult": "Before encryption, attacker exfiltrated 14.7GB to 203.0.113.87:443. Traffic analysis shows database dumps and compressed archives. No decryption without payment or backups."
+      }
+    ],
+    "outcomes": [
+      "Attack vector confirmed: phishing email with malicious macro targeting HR department",
+      "REvil ransomware deployed via Cobalt Strike framework",
+      "Attacker maintained access for 2 hours before triggering encryption",
+      "14.7GB of sensitive data exfiltrated before encryption",
+      "No viable decryption without paying ransom or restoring from backups",
+      "Recommended: Restore from offline backups (available), do not pay ransom",
+      "Indicators of Compromise (IOCs) provided to threat intelligence platforms"
+    ],
+    "legalNotes": [
+      "Report filed with FBI Internet Crime Complaint Center (IC3)",
+      "HIPAA breach notification required within 60 days",
+      "Forensic evidence preserved with chain of custody for potential prosecution",
+      "External threat intelligence correlated C2 infrastructure with known APT group"
+    ]
+  },
+  {
+    "id": "insider-data-theft",
+    "scenario": "Former employee suspected of stealing proprietary source code and customer database before resignation. Company seeks evidence for civil litigation and potential criminal charges.",
+    "artifacts": [
+      {
+        "type": "Workstation Image",
+        "description": "Full disk image of employee's company-issued laptop (Dell Latitude, 512GB SSD)",
+        "location": "Evidence locker - sealed laptop acquired 2 days after resignation"
+      },
+      {
+        "type": "Network Logs",
+        "description": "VPN access logs, web proxy logs, and file server access logs covering 30 days",
+        "location": "SIEM system (Splunk) - exported logs 45GB"
+      },
+      {
+        "type": "Cloud Activity",
+        "description": "G Suite admin logs showing Drive, Gmail, and Chrome sync activity",
+        "location": "G Suite Admin Console - 90-day retention"
+      },
+      {
+        "type": "Badge Access",
+        "description": "Physical access control logs showing building entry/exit times",
+        "location": "HID access control database"
+      },
+      {
+        "type": "USB History",
+        "description": "Registry artifacts showing connected USB devices",
+        "location": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\USBSTOR"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Image laptop SSD and verify hash before analysis to maintain evidence integrity",
+        "tool": "FTK Imager",
+        "expectedResult": "Forensic image created: 512GB → 287GB (E01 compressed). MD5 and SHA-256 hashes documented. Original laptop sealed and stored."
+      },
+      {
+        "step": 2,
+        "action": "Analyze USB device history and identify external storage connections",
+        "tool": "USB Detective / Registry Explorer",
+        "expectedResult": "Found 3 USB devices connected in final week: 'SanDisk Extreme 256GB' (S/N: AA01...), 'Samsung T7 1TB' (S/N: S4Z...), personal phone 'Galaxy S21' (MTP mode)."
+      },
+      {
+        "step": 3,
+        "action": "Recover deleted files and analyze file system timestamps for exfiltration indicators",
+        "tool": "Autopsy",
+        "expectedResult": "Recovered 1,247 deleted files including .git repository clones, database exports (.sql, .csv), and 'TO_PERSONAL' folder deleted 1 day before resignation. MACB timestamps show bulk file access."
+      },
+      {
+        "step": 4,
+        "action": "Examine browser history, cloud uploads, and personal email usage",
+        "tool": "Magnet AXIOM",
+        "expectedResult": "Chrome history shows 34 uploads to personal Dropbox account. Gmail sent 17 emails to personal address with attachments. Dropbox web interface accessed 47 times in final week."
+      },
+      {
+        "step": 5,
+        "action": "Correlate G Suite logs with local activity to identify cloud exfiltration",
+        "tool": "Google Takeout / GCAT",
+        "expectedResult": "G Suite logs confirm: 2.3GB uploaded to personal Drive, 47 files shared externally, Chrome sync transferred 847 passwords and bookmarks to personal Google account."
+      },
+      {
+        "step": 6,
+        "action": "Analyze network traffic logs for off-hours activity and large transfers",
+        "tool": "Splunk",
+        "expectedResult": "Off-hours VPN access detected: 11:47 PM - 2:34 AM on 3 consecutive nights before resignation. File server logs show 18GB transferred to workstation during these sessions."
+      },
+      {
+        "step": 7,
+        "action": "Build timeline correlating physical access, digital activity, and data transfers",
+        "tool": "Plaso / Timesketch",
+        "expectedResult": "Timeline shows: After-hours badge entry → VPN login → Source code repository clones → USB device connection → Large file deletions → Dropbox uploads. Pattern repeated 3x."
+      }
+    ],
+    "outcomes": [
+      "Conclusive evidence of intentional data theft: source code, customer database, and proprietary algorithms",
+      "Employee accessed systems during off-hours (11 PM - 2 AM) when monitoring less likely",
+      "Multi-channel exfiltration: USB drives, personal Dropbox, Gmail attachments, Google Drive",
+      "Approximately 23GB of company data stolen across all channels",
+      "Deleted local copies and cleared browser history to conceal activity (unsuccessful due to forensic recovery)",
+      "Timeline evidence suitable for civil litigation and criminal referral",
+      "Company recovered list of compromised files for damage assessment"
+    ],
+    "legalNotes": [
+      "Evidence meets admissibility standards: forensic imaging with verified hashes, documented chain of custody",
+      "Computer Fraud and Abuse Act (CFAA) violation: unauthorized access after resignation notice",
+      "Trade secret misappropriation under Defend Trade Secrets Act (DTSA)",
+      "Civil lawsuit filed: breach of employment agreement and NDA",
+      "Criminal complaint filed with local FBI field office for federal prosecution consideration"
+    ]
+  },
+  {
+    "id": "cloud-credential-theft",
+    "scenario": "SaaS company detects unauthorized access to AWS cloud infrastructure. Attacker accessed S3 buckets containing customer data. Investigate breach source, scope, and data exposure.",
+    "artifacts": [
+      {
+        "type": "AWS CloudTrail Logs",
+        "description": "API call history for all AWS services over past 90 days",
+        "location": "S3 bucket: s3://company-cloudtrail-logs/"
+      },
+      {
+        "type": "AWS GuardDuty Alerts",
+        "description": "Security findings including unusual API calls and credential usage",
+        "location": "GuardDuty console - 47 high-severity findings"
+      },
+      {
+        "type": "VPC Flow Logs",
+        "description": "Network traffic logs for EC2 instances and load balancers",
+        "location": "S3 bucket: s3://company-vpc-flowlogs/"
+      },
+      {
+        "type": "IAM Access Advisor",
+        "description": "Service access timestamps for all IAM users and roles",
+        "location": "IAM Console - Last accessed data"
+      },
+      {
+        "type": "S3 Access Logs",
+        "description": "Bucket access logs showing object downloads",
+        "location": "S3 bucket: s3://company-s3-access-logs/"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Review GuardDuty alerts for initial indicators and suspicious activity timeline",
+        "tool": "AWS GuardDuty / CloudWatch",
+        "expectedResult": "GuardDuty flagged: UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration and Exfiltration:S3/ObjectRead.Unusual from unknown IP 198.51.100.42. Activity started 72 hours ago."
+      },
+      {
+        "step": 2,
+        "action": "Analyze CloudTrail logs to identify compromised credentials and attacker actions",
+        "tool": "AWS Athena / CloudTrail Lake",
+        "expectedResult": "IAM user 'jenkins-deploy' accessed from 198.51.100.42 (Russia). Credentials compromised via exposed .aws/credentials in public GitHub repository. User enumerated S3 buckets, IAM policies, and EC2 instances."
+      },
+      {
+        "step": 3,
+        "action": "Query S3 access logs to determine which objects were accessed or downloaded",
+        "tool": "AWS Athena",
+        "expectedResult": "Attacker downloaded 847 objects from s3://customer-data-prod/ totaling 23.7GB. Files include customer databases, API credentials, and encryption keys. Downloads occurred over 3 separate sessions."
+      },
+      {
+        "step": 4,
+        "action": "Review IAM Access Advisor to identify privilege escalation attempts",
+        "tool": "AWS IAM Console / CLI",
+        "expectedResult": "Attacker attempted CreateAccessKey for admin users (failed - insufficient permissions). Successfully used AssumeRole to escalate from jenkins-deploy to data-scientist role with broader S3 access."
+      },
+      {
+        "step": 5,
+        "action": "Analyze VPC flow logs for data exfiltration endpoints and volume",
+        "tool": "AWS Athena / VPC Flow Logs",
+        "expectedResult": "Large data transfers to 198.51.100.42:443 correlate with S3 downloads. Total egress: 24.1GB over 3 sessions. Traffic used HTTPS, encrypted in transit. Destination IP traced to VPN exit node in Russia."
+      },
+      {
+        "step": 6,
+        "action": "Check for backdoor creation: new IAM users, access keys, or Lambda functions",
+        "tool": "CloudTrail / IAM Console",
+        "expectedResult": "Attacker created IAM user 'backup-service' with programmatic access. Created access key AKIA... and attached PowerUserAccess policy. Lambda function 'log-processor' created for persistence (not executed yet)."
+      },
+      {
+        "step": 7,
+        "action": "Reconstruct complete attack timeline and assess impact",
+        "tool": "CloudTrail Insights / Timeline tools",
+        "expectedResult": "Timeline: Credentials exposed on GitHub → 6 hours → First AWS login → Reconnaissance (2 hours) → Privilege escalation → Data exfiltration (3 sessions over 72 hours) → Backdoor creation."
+      }
+    ],
+    "outcomes": [
+      "Attack vector: Exposed AWS credentials in public GitHub repository (committed 8 months prior)",
+      "Compromised IAM user: jenkins-deploy with S3 read permissions",
+      "Privilege escalation: AssumeRole to data-scientist role for broader access",
+      "Data breach: 847 customer database files totaling 23.7GB exfiltrated",
+      "Persistence: Backdoor IAM user and Lambda function created",
+      "Affected customers: 15,234 accounts with PII exposed",
+      "Remediation: Revoke all access keys, rotate credentials, enable MFA, remove backdoors, notify affected customers"
+    ],
+    "legalNotes": [
+      "GDPR breach notification required within 72 hours to EU supervisory authorities",
+      "CCPA breach notification required for California residents",
+      "Forensic evidence preserved in S3 with object lock and Legal Hold",
+      "FBI Cyber Division notified - potential attribution to criminal organization",
+      "Cyber insurance claim filed for breach response costs and liability coverage"
+    ]
+  },
+  {
+    "id": "mobile-stalkerware",
+    "scenario": "Domestic violence case where victim suspects spyware installed on phone by abusive partner. Device shows signs of unauthorized monitoring and location tracking.",
+    "artifacts": [
+      {
+        "type": "Android Phone (Victim)",
+        "description": "Samsung Galaxy S21 with suspected spyware. Device not factory reset.",
+        "location": "Evidence locker - victim provided device voluntarily"
+      },
+      {
+        "type": "Google Location History",
+        "description": "Timeline of device location data from Google account",
+        "location": "Google Takeout export - 18 months of data"
+      },
+      {
+        "type": "Installed Apps List",
+        "description": "All applications including system apps and hidden apps",
+        "location": "ADB shell: pm list packages -f"
+      },
+      {
+        "type": "Network Traffic Capture",
+        "description": "PCAP of device network activity over 24 hours",
+        "location": "Captured via WiFi access point monitoring"
+      },
+      {
+        "type": "Cloud Backup",
+        "description": "Google Drive backup containing app data and settings",
+        "location": "Google Drive - backup dated 3 days ago"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Create forensic backup of device before analysis to preserve evidence",
+        "tool": "Magnet AXIOM / ADB",
+        "expectedResult": "Full file system backup created: 47GB. Backup includes app data, system files, and deleted file recovery. Hash verified. Original device sealed."
+      },
+      {
+        "step": 2,
+        "action": "Scan for known stalkerware signatures and suspicious apps",
+        "tool": "AXIOM Cyber / Stinger",
+        "expectedResult": "Detected: FlexiSPY stalkerware installed 8 months ago. App disguised as 'System Update Service'. Has permissions: Location, SMS, Call logs, Camera, Microphone, Contacts."
+      },
+      {
+        "step": 3,
+        "action": "Extract stalkerware configuration and C2 server details",
+        "tool": "APK analysis / Jadx decompiler",
+        "expectedResult": "Stalkerware configured with account ID linked to suspect's email address. C2 server: spyware-cloud.example. App uploads data every 15 minutes: GPS coordinates, SMS, call recordings, photos."
+      },
+      {
+        "step": 4,
+        "action": "Review location history to establish monitoring timeline",
+        "tool": "Google Location History / Timeline analysis",
+        "expectedResult": "Location tracking shows victim's movements for past 8 months with GPS coordinates every 5-10 minutes. Data correlates with stalkerware installation date. Suspect demonstrated knowledge of victim's whereabouts."
+      },
+      {
+        "step": 5,
+        "action": "Analyze network traffic for data exfiltration to C2 server",
+        "tool": "Wireshark / NetworkMiner",
+        "expectedResult": "Captured 847 HTTPS connections to spyware-cloud.example over 24 hours. Traffic analysis shows encrypted uploads every 15 minutes (average 2.3MB each). Certificate shows C2 infrastructure."
+      },
+      {
+        "step": 6,
+        "action": "Extract call recordings and SMS intercepts from stalkerware data directory",
+        "tool": "AXIOM / File system analysis",
+        "expectedResult": "Found 234 call recordings (total 4.7GB) and 1,847 intercepted SMS messages. Recordings include conversations with victim's attorney, therapist, and family members. SMS includes 2FA codes and private conversations."
+      },
+      {
+        "step": 7,
+        "action": "Correlate suspect's access to device with stalkerware installation timeline",
+        "tool": "Timeline analysis / Statement review",
+        "expectedResult": "Victim statements confirm suspect had physical access to phone 8 months ago during relationship. Phone briefly taken under pretense of 'software update'. Timeline matches stalkerware installation timestamp exactly."
+      }
+    ],
+    "outcomes": [
+      "FlexiSPY commercial stalkerware confirmed on victim's device",
+      "Installation occurred 8 months ago when suspect had brief physical access",
+      "Stalkerware account linked to suspect's email address (definitive attribution)",
+      "Extensive surveillance: location tracking, SMS interception, call recording, photo access",
+      "234 call recordings and 1,847 SMS messages intercepted over 8 months",
+      "Stalkerware granted access to conversations with attorney (attorney-client privilege violation)",
+      "Evidence suitable for criminal wiretapping charges and protective order",
+      "Device forensically cleaned and stalkerware removed for victim safety"
+    ],
+    "legalNotes": [
+      "Wiretapping Act violation: unauthorized interception of electronic communications",
+      "Computer Fraud and Abuse Act (CFAA) violation: unauthorized access to protected computer",
+      "Federal stalking statute 18 U.S.C. § 2261A applicable",
+      "Evidence supports restraining order and criminal prosecution",
+      "Attorney-client privilege violated - potential suppression of evidence in civil proceedings",
+      "Victim referred to domestic violence resources and device security hardening"
+    ]
+  },
+  {
+    "id": "moveit-zero-day-breach",
+    "scenario": "A government agency discovers that attackers exploited a security hole in their MOVEit file transfer software before a patch was available. Thousands of sensitive files were quietly stolen. The same flaw hit hundreds of organizations worldwide in May 2023. Investigate how attackers got in, what they took, and how to stop further damage.",
+    "artifacts": [
+      {
+        "type": "MOVEit Web Server Logs",
+        "description": "HTTP access logs showing all requests to the MOVEit web portal over 14 days",
+        "location": "C:\\MOVEitTransfer\\Logs\\access.log (22GB)"
+      },
+      {
+        "type": "SQL Database Logs",
+        "description": "Database query logs revealing the SQL injection commands attackers ran",
+        "location": "SQL Server log files on moveit-db01 server"
+      },
+      {
+        "type": "File Transfer Audit Trail",
+        "description": "Complete record of every file downloaded through the MOVEit system",
+        "location": "MOVEit admin console - audit log export"
+      },
+      {
+        "type": "Windows Event Logs",
+        "description": "System and security event logs from the MOVEit server",
+        "location": "C:\\Windows\\System32\\winevt\\Logs\\ (forwarded to SIEM)"
+      },
+      {
+        "type": "Network Flow Data",
+        "description": "Records of all network connections showing data leaving the server",
+        "location": "Cisco NetFlow collector - 30-day retention"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Search web logs for the known SQL injection pattern attackers used to exploit MOVEit",
+        "tool": "Splunk / grep",
+        "expectedResult": "Found 847 requests containing SQL injection strings from IP 185.220.101.x on May 28. Requests targeted the guestaccess.aspx endpoint. First hit at 02:13 UTC - five days before public disclosure."
+      },
+      {
+        "step": 2,
+        "action": "Check if attackers planted a web shell (a hidden backdoor file) on the server",
+        "tool": "Autopsy / PowerShell file search",
+        "expectedResult": "Found malicious file 'human2.aspx' in the MOVEit web root folder. Created at 02:47 UTC. This web shell let attackers run commands on the server from anywhere in the world."
+      },
+      {
+        "step": 3,
+        "action": "Review SQL database logs to see what data the attacker queried and extracted",
+        "tool": "SQL Server Profiler / Log Parser",
+        "expectedResult": "Attacker ran queries to list all user accounts, file names, and folder structures. Then ran bulk SELECT statements exporting 14,203 file records. Queries ran for 23 minutes total."
+      },
+      {
+        "step": 4,
+        "action": "Analyze the file transfer audit trail to identify every file that was stolen",
+        "tool": "MOVEit Admin Console / Splunk",
+        "expectedResult": "Confirmed 4,847 files downloaded via web shell. Files include payroll records, tax documents, and employee personal data (SSN, DOB, addresses). Total size: 8.9GB."
+      },
+      {
+        "step": 5,
+        "action": "Trace outbound connections to find where stolen data was sent",
+        "tool": "Wireshark / NetFlow analysis",
+        "expectedResult": "All 8.9GB transferred to three IP addresses linked to Cl0p ransomware group. Data sent using HTTPS on port 443 to blend with normal traffic. Transfer completed in 41 minutes."
+      },
+      {
+        "step": 6,
+        "action": "Check all other systems the MOVEit server connects to for signs of spread",
+        "tool": "Nessus / Active Directory audit",
+        "expectedResult": "MOVEit service account had excessive permissions to file shares. Same service account logged into two other internal servers during the attack window - lateral movement attempted but no data taken."
+      },
+      {
+        "step": 7,
+        "action": "Remove the web shell, apply the emergency patch, and document the full timeline",
+        "tool": "Manual remediation / Patch management",
+        "expectedResult": "Web shell removed, MOVEit patched to version 2023.0.2. Service account locked and permissions reduced. Timeline: SQL injection at 02:13 → web shell planted 02:47 → data exfiltrated 03:10-03:51."
+      }
+    ],
+    "outcomes": [
+      "Entry point confirmed: SQL injection flaw in MOVEit Transfer web application (CVE-2023-34362)",
+      "Attackers planted a hidden web shell within 34 minutes of first exploitation",
+      "4,847 sensitive files stolen including personal data of 12,000 employees",
+      "Attack attributed to Cl0p ransomware group based on infrastructure and tactics",
+      "Organization had five days of exposure before MOVEit issued an emergency patch",
+      "No ransomware deployed - attackers only stole data and threatened public release",
+      "All affected individuals notified and credit monitoring offered"
+    ],
+    "legalNotes": [
+      "Mandatory breach notification filed with data protection authority within 72 hours",
+      "FISMA compliance review triggered for federal agency systems",
+      "Cl0p group known to post stolen data on dark web leak sites if ransom not paid",
+      "CISA emergency directive issued to all federal agencies to patch within 48 hours",
+      "Forensic evidence preserved and shared with FBI Cyber Division"
+    ]
+  },
+  {
+    "id": "change-healthcare-ransomware",
+    "scenario": "Change Healthcare (owned by UnitedHealth Group) was hit by ransomware in February 2024. The attack shut down payment systems used by pharmacies and hospitals across the entire United States. Patients could not get prescriptions filled for weeks. Investigate how attackers broke in using a single account without MFA, what they encrypted, and the true scale of the damage - including the largest healthcare data breach in US history.",
+    "artifacts": [
+      {
+        "type": "Citrix Remote Access Logs",
+        "description": "Login records for the Citrix gateway used by remote employees",
+        "location": "Citrix ADC appliance logs - exported to SIEM"
+      },
+      {
+        "type": "Active Directory Logs",
+        "description": "Records of user account activity, privilege changes, and login events",
+        "location": "Windows Security Event logs from all Domain Controllers"
+      },
+      {
+        "type": "Endpoint Detection Alerts",
+        "description": "Security software alerts from workstations and servers",
+        "location": "Microsoft Defender for Endpoint console"
+      },
+      {
+        "type": "Backup System Logs",
+        "description": "Records showing when and how backups were accessed or deleted",
+        "location": "Veeam backup server logs"
+      },
+      {
+        "type": "Dark Web Monitoring Alerts",
+        "description": "Intelligence reports showing stolen data posted for sale online",
+        "location": "Threat intelligence platform - ALPHV/BlackCat leak site archive"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Identify how attackers first logged in by reviewing Citrix remote access logs",
+        "tool": "Splunk / Citrix logs",
+        "expectedResult": "Found successful login from Eastern Europe using valid employee credentials on February 12 at 03:30 AM. Critical finding: the account had no multi-factor authentication enabled despite company policy."
+      },
+      {
+        "step": 2,
+        "action": "Trace attacker movement inside the network after initial login",
+        "tool": "Microsoft Defender for Endpoint / AD logs",
+        "expectedResult": "Over 9 days, attackers moved quietly through the network stealing credentials from 28 servers. They used legitimate admin tools to avoid detection and gained Domain Admin rights on day 4."
+      },
+      {
+        "step": 3,
+        "action": "Find out when and how the backups were destroyed before ransomware deployed",
+        "tool": "Veeam logs / Windows Event Logs",
+        "expectedResult": "On February 20 attackers used Domain Admin credentials to log into the Veeam backup server and deleted 3 years of backups over 4 hours. Ransomware was deployed the next morning."
+      },
+      {
+        "step": 4,
+        "action": "Determine the scale of encryption - which systems were locked",
+        "tool": "Network scanning / EDR telemetry",
+        "expectedResult": "ALPHV/BlackCat ransomware encrypted systems across 111 datacenters. Over 100 terabytes of data locked. Payment processing systems, pharmacy claim databases, and billing platforms all taken offline simultaneously."
+      },
+      {
+        "step": 5,
+        "action": "Investigate data theft that happened before the encryption attack",
+        "tool": "NetFlow analysis / DLP logs",
+        "expectedResult": "Over 9 days before encryption, attackers slowly exfiltrated 6TB of data. Data includes health records for an estimated 100 million Americans - the largest healthcare breach in US history."
+      },
+      {
+        "step": 6,
+        "action": "Document the ransom payment and ALPHV betrayal",
+        "tool": "Blockchain analysis / OSINT",
+        "expectedResult": "UnitedHealth paid $22 million ransom in Bitcoin. ALPHV ransomware group then shut down their own operation and stole the $22M from their own affiliate who carried out the attack."
+      },
+      {
+        "step": 7,
+        "action": "Document full business impact and recovery timeline",
+        "tool": "Business impact analysis",
+        "expectedResult": "Payment systems offline for 3+ weeks. 94% of US hospitals reported financial impact. 1,800 pharmacies could not process prescriptions. Total damage estimated at $870 million. Recovery took 5 months."
+      }
+    ],
+    "outcomes": [
+      "Root cause: Single employee account with no multi-factor authentication on Citrix portal",
+      "Attackers spent 9 days quietly inside the network before striking",
+      "Backups were deliberately destroyed hours before ransomware deployment",
+      "100 million Americans had health records stolen - largest healthcare data breach in US history",
+      "UnitedHealth paid a $22 million ransom and was then betrayed by the ransomware group",
+      "Attack disrupted healthcare payments for the entire United States for weeks",
+      "Total financial damage exceeded $870 million in one fiscal quarter"
+    ],
+    "legalNotes": [
+      "US Senate held hearings; UnitedHealth CEO testified about the breach",
+      "HHS Office for Civil Rights opened HIPAA investigation into Change Healthcare",
+      "Multiple class-action lawsuits filed by affected patients and healthcare providers",
+      "DOJ investigated whether ransom payment violated sanctions regulations",
+      "Case became a landmark example used to push mandatory MFA laws in healthcare"
+    ]
+  },
+  {
+    "id": "mgm-scattered-spider-attack",
+    "scenario": "MGM Resorts hotels and casinos in Las Vegas were crippled in September 2023 after attackers used a single phone call to trick IT support into giving them access. Slot machines went dark, hotel room keys stopped working, and the company lost over $100 million. The group behind it, Scattered Spider, were mostly young English-speaking people aged 16-24. Investigate how a simple phone call turned into a full casino shutdown.",
+    "artifacts": [
+      {
+        "type": "IT Help Desk Call Recording",
+        "description": "Recorded phone call where attacker impersonated an employee to reset credentials",
+        "location": "Telephony system recording archive"
+      },
+      {
+        "type": "Okta Identity Platform Logs",
+        "description": "Identity and access management logs showing all login events and account changes",
+        "location": "Okta Admin Console - exported activity logs"
+      },
+      {
+        "type": "Azure Active Directory Logs",
+        "description": "Cloud identity logs for Microsoft 365 and Azure services",
+        "location": "Azure Security Center - sign-in and audit logs"
+      },
+      {
+        "type": "LinkedIn Profile Data",
+        "description": "Publicly available employee information used for social engineering reconnaissance",
+        "location": "Open source intelligence - LinkedIn, company website, social media"
+      },
+      {
+        "type": "VMware vCenter Logs",
+        "description": "Logs showing access and changes to the virtual machine infrastructure",
+        "location": "vCenter Server event logs and vSphere alarms"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Reconstruct the initial phone call by reviewing help desk recordings",
+        "tool": "Call recording system / witness interviews",
+        "expectedResult": "Attacker found an employee's name and employer on LinkedIn. Called IT help desk, claimed to be that employee, said they forgot their password. Help desk reset credentials in 10 minutes. No red flags were raised."
+      },
+      {
+        "step": 2,
+        "action": "Trace attacker actions in Okta after the account was compromised",
+        "tool": "Okta System Log / Splunk",
+        "expectedResult": "Within 30 minutes attacker logged into Okta from a VPN IP. Began creating new admin accounts and resetting other employees' passwords. Gained access to all 40,000+ employee app assignments."
+      },
+      {
+        "step": 3,
+        "action": "Identify how attackers moved from Okta into casino and hotel systems",
+        "tool": "Azure AD logs / VMware logs",
+        "expectedResult": "Used Okta super-admin rights to access Azure AD, then pivoted into on-premise data centers via VMware vCenter. Found an admin account reusing the same password across 14 servers."
+      },
+      {
+        "step": 4,
+        "action": "Determine how ransomware encrypted hundreds of systems simultaneously",
+        "tool": "EDR telemetry / incident responder reports",
+        "expectedResult": "ALPHV/BlackCat ransomware deployed against VMware ESXi hypervisors. One command encrypted hundreds of VMs at once. Casino systems, hotel check-in, and payments all went offline together."
+      },
+      {
+        "step": 5,
+        "action": "Investigate whether data was stolen before encryption",
+        "tool": "DLP logs / DNS query analysis",
+        "expectedResult": "Found data transfers to cloud storage over 4 days before encryption. Estimated 6TB of customer data exfiltrated including names, dates of birth, driver's licenses, and loyalty point records."
+      },
+      {
+        "step": 6,
+        "action": "Profile the attacker group using OSINT and threat intelligence",
+        "tool": "Threat intelligence platforms / FBI liaison",
+        "expectedResult": "Scattered Spider identified as English-speaking teenagers and young adults (aged 16-24) coordinating on Telegram. Known for impersonating IT staff. Members identified in the US and UK."
+      }
+    ],
+    "outcomes": [
+      "Attack started with a single 10-minute phone call impersonating an employee",
+      "Attacker used LinkedIn to find the employee's name before calling",
+      "Full control of identity systems achieved within 30 minutes of the first call",
+      "Ransomware encrypted hundreds of servers by attacking the virtualization layer",
+      "MGM Las Vegas operations disrupted for 10 days - slots, hotel keys, and apps all offline",
+      "Estimated 6TB of customer data stolen before encryption",
+      "MGM refused to pay ransom; losses exceeded $100 million in one quarter"
+    ],
+    "legalNotes": [
+      "Multiple Scattered Spider members arrested by FBI and UK NCA in 2024",
+      "SEC investigation opened into MGM's disclosure timeline",
+      "Class-action lawsuits filed by hotel guests whose personal data was stolen",
+      "Case showed that most MFA-bypass attacks start with a phone call, not a computer hack",
+      "Two members charged under CFAA with maximum 20-year sentences"
+    ]
+  },
+  {
+    "id": "deepfake-cfo-fraud",
+    "scenario": "In February 2024, a finance worker at a company in Hong Kong was tricked into paying $25 million USD after attending a video call with people who looked and sounded exactly like the company's CFO and other executives - but they were all AI-generated deepfakes. Not a single real person was on the call. By the time the fraud was discovered, the money was gone across five bank transfers. Investigate how the deepfakes were made and how the fraud went undetected.",
+    "artifacts": [
+      {
+        "type": "Video Call Recording",
+        "description": "Screen recording of the fraudulent video conference saved by the victim employee",
+        "location": "Employee workstation - screen recorder output file"
+      },
+      {
+        "type": "Phishing Email Thread",
+        "description": "Emails from fraudsters posing as the CFO's office requesting the payment",
+        "location": "Microsoft Outlook OST file on victim's workstation"
+      },
+      {
+        "type": "Bank Transfer Records",
+        "description": "Wire transfer instructions and confirmation receipts for all five transactions",
+        "location": "Corporate banking portal transaction history"
+      },
+      {
+        "type": "Source Video Material",
+        "description": "Public videos used to train the deepfake AI model of the CFO",
+        "location": "YouTube public videos, earnings calls, and company website media"
+      },
+      {
+        "type": "Network Proxy Logs",
+        "description": "Logs showing websites the employee visited before and during the fraud",
+        "location": "Corporate firewall proxy logs - 30-day retention"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Analyze the phishing emails to understand first contact with the victim",
+        "tool": "Email header analysis / Outlook forensics",
+        "expectedResult": "Emails came from a domain one letter different from the real company domain. Contained correct internal terminology and referenced a real pending deal. Originated from servers in Southeast Asia."
+      },
+      {
+        "step": 2,
+        "action": "Examine the video call recording frame-by-frame for signs of AI manipulation",
+        "tool": "Microsoft Video Authenticator / FotoForensics / manual visual analysis",
+        "expectedResult": "Found subtle artifacts: unnatural blinking patterns, slight facial boundary shimmer, audio mismatching mouth movements by 80-120ms. No real-time deepfake detection software was deployed."
+      },
+      {
+        "step": 3,
+        "action": "Identify the public videos attackers used to build the deepfake models",
+        "tool": "OSINT / YouTube archive search",
+        "expectedResult": "Found 47 public videos of the real CFO totaling 3.5 hours of footage - enough to train a convincing deepfake voice and face model using publicly available AI tools."
+      },
+      {
+        "step": 4,
+        "action": "Trace all bank transfers and follow the money",
+        "tool": "Blockchain analysis / SWIFT records / law enforcement liaison",
+        "expectedResult": "Five wire transfers totaling HKD 200 million ($25.6M USD) sent to five accounts in Hong Kong. All accounts emptied within 24 hours and funds moved through crypto exchanges. $0 recovered."
+      },
+      {
+        "step": 5,
+        "action": "Identify the attackers using available digital evidence",
+        "tool": "IP analysis / OSINT / Interpol cooperation",
+        "expectedResult": "Attack infrastructure traced to servers in Southeast Asia. Style matches known Business Email Compromise groups. Two suspects identified but jurisdictional challenges prevent arrest."
+      },
+      {
+        "step": 6,
+        "action": "Document all the security failures that allowed the fraud to succeed",
+        "tool": "Security posture review / policy audit",
+        "expectedResult": "No deepfake detection tools in place. No phone or out-of-band verification required for large wire transfers. No code-word confirmation protocol for video calls. Six separate approval failures identified."
+      }
+    ],
+    "outcomes": [
+      "Entire attack used AI-generated deepfake video of company executives - the largest at the time",
+      "Attackers built convincing deepfakes using only publicly available YouTube videos",
+      "25.6 million USD lost across five wire transfers in a single day",
+      "Funds moved through crypto exchanges within 24 hours - all money unrecoverable",
+      "Company had zero deepfake detection tools or out-of-band verification protocols",
+      "Six suspects arrested by Hong Kong police in connection with the scheme",
+      "Became the most high-profile deepfake fraud case in history at time of discovery"
+    ],
+    "legalNotes": [
+      "Hong Kong Police Force referred case to Interpol for international cooperation",
+      "Hong Kong Monetary Authority issued new guidance on transaction verification",
+      "FBI issued advisory warning of increasing deepfake Business Email Compromise attacks",
+      "Case used in US Senate testimony to support AI deepfake disclosure legislation",
+      "Multiple financial regulators updated wire transfer verification requirements after this case"
+    ]
+  },
+  {
+    "id": "salt-typhoon-telecom-espionage",
+    "scenario": "In late 2024, the US government revealed that a Chinese state-sponsored hacking group called Salt Typhoon had secretly lived inside the networks of major US telecom companies - including AT&T, Verizon, and T-Mobile - for over a year. They got into the law enforcement wiretap systems that courts authorize for surveillance. The attackers could listen to phone calls and read text messages of senior US government officials and political candidates. Investigate the intrusion, the tools used, and the intelligence stolen.",
+    "artifacts": [
+      {
+        "type": "Network Router Firmware Images",
+        "description": "Firmware from Cisco and Juniper routers found to have been secretly modified",
+        "location": "Core network routers across multiple carrier data centers"
+      },
+      {
+        "type": "CALEA System Logs",
+        "description": "Access logs for the lawful intercept systems used for court-authorized surveillance",
+        "location": "Secure law enforcement gateway servers"
+      },
+      {
+        "type": "NetFlow and BGP Logs",
+        "description": "Network routing records showing unusual traffic from core systems",
+        "location": "NOC (Network Operations Center) monitoring systems"
+      },
+      {
+        "type": "Telecommunications Signaling Logs",
+        "description": "SS7 and Diameter protocol logs showing location queries and call intercepts",
+        "location": "Signaling gateway servers and IMS logs"
+      },
+      {
+        "type": "CISA Threat Intelligence Reports",
+        "description": "Government advisories with known attack indicators for Salt Typhoon",
+        "location": "CISA advisory AA24-038A and FBI briefing materials"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Inspect router firmware for unauthorized hidden modifications",
+        "tool": "Cisco Talos / firmware analysis / binwalk",
+        "expectedResult": "Found malicious implants in Cisco IOS-XE firmware on 12 edge routers. Installed by exploiting CVE-2023-20198 (a Cisco zero-day vulnerability). Modified at OS level to hide from normal security scans. First infection dated to early 2023."
+      },
+      {
+        "step": 2,
+        "action": "Map how attackers moved from edge routers deeper into the telecom network",
+        "tool": "Network topology analysis / Zeek IDS logs",
+        "expectedResult": "Attackers used compromised routers as footholds, then slowly moved to internal systems over eight months. They mapped the entire carrier network to find which servers handled law enforcement wiretap data. No detection during this period."
+      },
+      {
+        "step": 3,
+        "action": "Investigate unauthorized access to CALEA law enforcement intercept systems",
+        "tool": "Restricted CALEA gateway logs / FBI assistance",
+        "expectedResult": "Attackers accessed CALEA portals used by FBI and DEA for court-authorized wiretaps. They queried surveillance target lists - seeing who US intelligence agencies were already monitoring. Described as one of the gravest intelligence compromises in history."
+      },
+      {
+        "step": 4,
+        "action": "Determine which individuals had their calls and texts intercepted",
+        "tool": "Call record analysis / SS7 log correlation",
+        "expectedResult": "Confirmed interception of communications belonging to senior officials from both US presidential campaigns, members of Congress, and State Department officials. Attackers were selective - only high-value targets."
+      },
+      {
+        "step": 5,
+        "action": "Identify the malware and attribute the attack",
+        "tool": "Malware analysis / CISA advisories / threat intelligence",
+        "expectedResult": "Tools match Salt Typhoon (also called Earth Estries) - a Chinese Ministry of State Security-linked group. Custom malware GhostSpider and Masol RAT identified. Same tools used in Taiwan and Southeast Asian government breaches."
+      },
+      {
+        "step": 6,
+        "action": "Assess total duration of access and coordinate eviction across all carriers",
+        "tool": "CISA Joint Cyber Defense Collaborative / carrier NOC teams",
+        "expectedResult": "Attackers had access for 12-18 months. CISA published emergency guidance. Carriers rotated all router credentials, patched firmware, and isolated CALEA systems. Full eviction took months due to the depth of network penetration."
+      }
+    ],
+    "outcomes": [
+      "Chinese state-sponsored group Salt Typhoon infiltrated at least 9 major US telecom companies",
+      "Entry point was an unpatched Cisco router vulnerability across carrier networks",
+      "Attackers accessed the US law enforcement wiretap system - seeing who the government was monitoring",
+      "Calls and texts of US presidential campaign staff, senators, and diplomats were intercepted",
+      "Attackers were undetected inside telecom networks for up to 18 months",
+      "Described by US officials as the worst telecom hack in US history",
+      "CISA recommended all Americans switch to encrypted messaging apps like Signal"
+    ],
+    "legalNotes": [
+      "US State Department summoned Chinese ambassador to formally protest",
+      "Senate Commerce Committee held emergency closed-door briefings for all senators",
+      "FCC opened investigation into telecom companies' cybersecurity practices",
+      "14 countries shared intelligence on Salt Typhoon attack indicators",
+      "Case drove bipartisan legislation to mandate stronger telecom network security standards"
+    ]
+  },
+  {
+    "id": "xz-utils-supply-chain-backdoor",
+    "scenario": "In March 2024, a Microsoft engineer named Andres Freund accidentally discovered that a widely-used open-source tool called XZ Utils had been secretly sabotaged. An attacker had spent two years earning trust in the open-source development community, then quietly inserted a hidden backdoor that would have let them log into millions of Linux servers worldwide without a password. It was caught just weeks before it would have reached every major Linux system on the internet. Investigate the two-year infiltration and the near-catastrophe that was narrowly avoided.",
+    "artifacts": [
+      {
+        "type": "XZ Utils Git Repository",
+        "description": "Full commit history of the XZ Utils project showing two years of contributions",
+        "location": "GitHub - github.com/tukaani-project/xz (archived)"
+      },
+      {
+        "type": "Malicious Binary (versions 5.6.0 and 5.6.1)",
+        "description": "The compromised compiled XZ library containing the hidden backdoor",
+        "location": "Infected: Debian testing, Fedora 40/41 beta, Kali Linux, Arch Linux"
+      },
+      {
+        "type": "SSH Daemon Performance Logs",
+        "description": "System resource logs showing abnormal CPU usage that led to discovery",
+        "location": "/var/log/syslog and systemd journal on affected systems"
+      },
+      {
+        "type": "Attacker Email Archives",
+        "description": "Emails sent to the XZ developer mailing list by the attacker account over two years",
+        "location": "Public mailing list archives - xz-devel@tukaani.org"
+      },
+      {
+        "type": "Obfuscated Test Files",
+        "description": "Binary test files in the repository that secretly contained the backdoor code",
+        "location": "xz/tests/ directory in versions 5.6.0 and 5.6.1 source tarballs"
+      }
+    ],
+    "workflow": [
+      {
+        "step": 1,
+        "action": "Understand how a tiny performance anomaly revealed the hidden backdoor",
+        "tool": "strace / systemd profiling / CPU monitoring",
+        "expectedResult": "Andres Freund noticed SSH logins used 300-500ms more CPU than normal. Used strace to trace the SSH daemon. Found the abnormal load came from the liblzma library inside XZ Utils. This tiny clue unraveled the entire operation."
+      },
+      {
+        "step": 2,
+        "action": "Analyze the git commit history to find all the malicious code changes",
+        "tool": "git log / git diff / binary analysis",
+        "expectedResult": "Malicious changes were spread across dozens of seemingly innocent commits over two years. The actual backdoor was hidden inside binary test files - not readable source code - to avoid code review. Final backdoor injected in versions 5.6.0 and 5.6.1."
+      },
+      {
+        "step": 3,
+        "action": "Reverse engineer the backdoor to understand what it would have done",
+        "tool": "Ghidra / Binary Ninja",
+        "expectedResult": "Backdoor modified the SSH authentication process at a deep system level. It would silently let anyone with a specific private key log into any affected server without a password. Only activated on x86-64 Linux systems running systemd."
+      },
+      {
+        "step": 4,
+        "action": "Reconstruct the attacker's two-year social engineering campaign",
+        "tool": "Email archive analysis / OSINT / GitHub account analysis",
+        "expectedResult": "Account 'Jia Tan' created in 2021. First two years: submitted only legitimate helpful code to build trust. Then gradually applied pressure on the burned-out original maintainer. Slowly took over the project's maintenance role - a classic long-game social engineering attack."
+      },
+      {
+        "step": 5,
+        "action": "Determine how widespread the infection was before discovery",
+        "tool": "Package manager database queries / Linux distro security bulletins",
+        "expectedResult": "Infection only reached beta/testing versions of Linux distributions. Stable production versions not yet infected. Millions of servers were days or weeks from receiving the infected update when discovery happened."
+      },
+      {
+        "step": 6,
+        "action": "Assess who was capable of executing this level of attack",
+        "tool": "Threat intelligence / nation-state attribution analysis",
+        "expectedResult": "Level of sophistication, patience (2+ years), and advanced binary obfuscation techniques point to nation-state resources. US intelligence and security researchers assess with moderate confidence this was a state-sponsored operation. Official attribution not confirmed."
+      }
+    ],
+    "outcomes": [
+      "Attacker spent two years pretending to be a helpful developer to earn enough trust to plant a backdoor",
+      "Backdoor was hidden inside binary test files - invisible to normal code review",
+      "If deployed, it would have given silent remote access to a vast portion of internet infrastructure",
+      "Discovery happened by accident - a developer noticed SSH was slightly slower than normal",
+      "Infected versions pulled within hours of disclosure - a major catastrophe narrowly avoided",
+      "XZ versions 5.6.0 and 5.6.1 immediately blacklisted across all major Linux distributions",
+      "Exposed a deep vulnerability in how open-source projects trust contributors with critical code"
+    ],
+    "legalNotes": [
+      "FBI and CISA issued joint advisory to immediately downgrade from XZ 5.6.0/5.6.1",
+      "GitHub suspended the 'Jia Tan' account and preserved data for law enforcement",
+      "US Congress held hearings on open-source software supply chain security",
+      "Major tech companies (Google, Microsoft, Amazon) funded open-source security audits after this",
+      "Identity of 'Jia Tan' remains officially unknown as of 2025 despite extensive investigation"
+    ]
+  }
+]

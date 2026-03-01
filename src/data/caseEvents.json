@@ -1,0 +1,99 @@
+[
+  {
+    "caseId": "ransomware-investigation",
+    "events": [
+      { "time": "09:47", "label": "Phishing Email Opened", "detail": "HR staff opened macro-enabled attachment", "severity": "high" },
+      { "time": "09:52", "label": "C2 Beacon Established", "detail": "Cobalt Strike beacon reached 203.0.113.87", "severity": "high" },
+      { "time": "10:30", "label": "Lateral Movement", "detail": "PsExec spawned across finance servers", "severity": "medium" },
+      { "time": "11:20", "label": "Encryption Triggered", "detail": "REvil payload began encrypting home directories", "severity": "critical" },
+      { "time": "11:47", "label": "Exfil Complete", "detail": "14.7GB transferred to remote host", "severity": "critical" }
+    ]
+  },
+  {
+    "caseId": "insider-data-theft",
+    "events": [
+      { "time": "22:47", "label": "After-hours VPN Login", "detail": "Employee connected from home network", "severity": "medium" },
+      { "time": "23:05", "label": "Repo Cloning", "detail": "Git repositories mirrored locally", "severity": "high" },
+      { "time": "23:41", "label": "USB Device Mounted", "detail": "SanDisk Extreme 256GB detected", "severity": "medium" },
+      { "time": "00:12", "label": "Dropbox Upload", "detail": "34 uploads to personal account", "severity": "high" },
+      { "time": "00:58", "label": "Deletion Attempt", "detail": "TO_PERSONAL folder removed", "severity": "low" }
+    ]
+  },
+  {
+    "caseId": "cloud-credential-theft",
+    "events": [
+      { "time": "06:12", "label": "Credentials Exposed", "detail": "AWS keys pushed to GitHub", "severity": "medium" },
+      { "time": "12:37", "label": "GuardDuty Alert", "detail": "Anomalous API calls detected", "severity": "high" },
+      { "time": "13:05", "label": "Privilege Escalation", "detail": "Assumed data-scientist role", "severity": "high" },
+      { "time": "14:20", "label": "Bulk S3 Download", "detail": "847 objects exfiltrated", "severity": "critical" },
+      { "time": "15:40", "label": "Backdoor User Created", "detail": "backup-service IAM user added", "severity": "critical" }
+    ]
+  },
+  {
+    "caseId": "mobile-stalkerware",
+    "events": [
+      { "time": "08:10", "label": "Device Seized", "detail": "Victim provided phone for imaging", "severity": "low" },
+      { "time": "09:25", "label": "FlexiSPY Located", "detail": "Hidden app identified", "severity": "high" },
+      { "time": "11:00", "label": "C2 Traffic Confirmed", "detail": "Encrypted uploads to spyware-cloud", "severity": "medium" },
+      { "time": "13:45", "label": "Data Extraction", "detail": "234 call recordings recovered", "severity": "high" },
+      { "time": "15:10", "label": "Attribution", "detail": "License tied to suspect email", "severity": "critical" }
+    ]
+  },
+  {
+    "caseId": "supply-chain-attack",
+    "events": [
+      { "time": "02:11", "label": "Malicious Package Published", "detail": "Trojanised npm package pushed to registry", "severity": "high" },
+      { "time": "06:30", "label": "CI/CD Pipeline Triggered", "detail": "Automated build pulled compromised dependency", "severity": "high" },
+      { "time": "08:45", "label": "Build Server Compromised", "detail": "Reverse shell spawned on build agent EC2", "severity": "critical" },
+      { "time": "09:17", "label": "Secrets Harvested", "detail": "Environment variables with prod DB credentials stolen", "severity": "critical" },
+      { "time": "10:02", "label": "Production DB Queried", "detail": "1.2M customer PII records exfiltrated via SQL dump", "severity": "critical" },
+      { "time": "11:40", "label": "Package Yanked", "detail": "Registry pulled malicious version after abuse report", "severity": "low" }
+    ]
+  },
+  {
+    "caseId": "business-email-compromise",
+    "events": [
+      { "time": "07:55", "label": "Executive Email Spoofed", "detail": "CFO email forged via lookalike domain c0mpany.com", "severity": "medium" },
+      { "time": "09:20", "label": "Wire Transfer Requested", "detail": "Finance team received $240K transfer instruction", "severity": "high" },
+      { "time": "09:48", "label": "Transfer Executed", "detail": "Funds wired to Hong Kong intermediary account", "severity": "critical" },
+      { "time": "14:30", "label": "Fraud Detected", "detail": "CFO unaware of transfer; IT security notified", "severity": "high" },
+      { "time": "15:05", "label": "Headers Analysed", "detail": "SPF/DKIM failed; originating IP traced to VPN exit node", "severity": "medium" },
+      { "time": "16:45", "label": "SWIFT Recall Initiated", "detail": "Bank contacted; partial funds recovery attempted", "severity": "low" }
+    ]
+  },
+  {
+    "caseId": "apt-nation-state-intrusion",
+    "events": [
+      { "time": "03:22", "label": "Zero-Day Exploited", "detail": "CVE-2024-XXXX triggered on VPN appliance", "severity": "critical" },
+      { "time": "03:25", "label": "Implant Dropped", "detail": "Custom backdoor written to /tmp/.update; persisted via cron", "severity": "critical" },
+      { "time": "05:10", "label": "Internal Reconnaissance", "detail": "LDAP enumeration of all domain users and groups", "severity": "high" },
+      { "time": "06:44", "label": "Domain Admin Gained", "detail": "Pass-the-hash attack leveraged NTLM hash from LSASS", "severity": "critical" },
+      { "time": "08:30", "label": "Classified Docs Staged", "detail": "450 documents archived to password-encrypted RAR", "severity": "critical" },
+      { "time": "09:15", "label": "Exfiltration via DNS Tunnel", "detail": "Data fragmented and encoded in TXT record queries", "severity": "critical" },
+      { "time": "18:00", "label": "Beaconing Silenced", "detail": "Attacker removed implant after successful exfil", "severity": "medium" }
+    ]
+  },
+  {
+    "caseId": "cryptocurrency-fraud",
+    "events": [
+      { "time": "10:05", "label": "Phishing Site Deployed", "detail": "Fake exchange ui.coinbase-secure.net went live", "severity": "medium" },
+      { "time": "11:30", "label": "Victims Lured", "detail": "Spam campaign sent to 80K addresses", "severity": "high" },
+      { "time": "13:42", "label": "Seed Phrases Harvested", "detail": "412 wallet credentials submitted via fake login", "severity": "critical" },
+      { "time": "14:00", "label": "Automated Draining", "detail": "Script swept wallets; 5.3 BTC moved to mixer", "severity": "critical" },
+      { "time": "16:20", "label": "Chain Analysis", "detail": "Chainalysis traced funds through three hops to exchange", "severity": "high" },
+      { "time": "18:55", "label": "Funds Frozen", "detail": "Exchange complied with law enforcement freeze request", "severity": "medium" }
+    ]
+  },
+  {
+    "caseId": "industrial-scada-breach",
+    "events": [
+      { "time": "00:30", "label": "IT-OT Boundary Crossed", "detail": "Attacker pivoted from IT VLAN to SCADA network via misconfigured firewall rule", "severity": "critical" },
+      { "time": "01:15", "label": "Engineering Workstation Compromised", "detail": "Remote access trojan installed on Siemens TIA Portal machine", "severity": "critical" },
+      { "time": "02:40", "label": "PLC Logic Downloaded", "detail": "Ladder logic read from production programmable controllers", "severity": "high" },
+      { "time": "03:05", "label": "Setpoints Modified", "detail": "Pressure thresholds altered on pipeline control unit", "severity": "critical" },
+      { "time": "04:20", "label": "Safety System Disabled", "detail": "Emergency shutdown relay bypassed; pressure spike imminent", "severity": "critical" },
+      { "time": "04:35", "label": "Physical Incident Averted", "detail": "Operator observed anomaly and triggered manual shutdown", "severity": "medium" },
+      { "time": "06:00", "label": "Forensic Imaging Begun", "detail": "All OT devices isolated; memory and logic captures started", "severity": "low" }
+    ]
+  }
+]
