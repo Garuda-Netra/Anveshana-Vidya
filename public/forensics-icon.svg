@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#060914" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f3ff" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="#00f3ff" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle with Neon Border -->
+  <circle cx="32" cy="32" r="30" fill="url(#bgGrad)" stroke="#00f3ff" stroke-width="2.5" />
+  
+  <!-- Garuda / Eagle Wings with Glow -->
+  <g transform="translate(8, 8) scale(2)" filter="url(#glow)">
+    <path
+      d="M3 14c2.6-3.2 5.4-4.8 9-5 3.6.2 6.4 1.8 9 5"
+      stroke="url(#wingGrad)"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M3 14l4-4 2 3 3-4 3 4 2-3 4 4"
+      stroke="url(#wingGrad)"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M12 9c-.9 1.2-1.6 2.5-2 4"
+      stroke="url(#wingGrad)"
+      stroke-width="2"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>
