@@ -52,8 +52,8 @@ export function EvidenceVaultModel() {
         <meshStandardMaterial color="#334155" metalness={0.4} roughness={0.3} />
       </mesh>
       {/* Platform Neon Trim */}
-      <mesh position={[0, -1.34, 0]}>
-        <torusGeometry args={[2.52, 0.03, 16, 32]} rotation={[Math.PI / 2, 0, 0]} />
+      <mesh position={[0, -1.34, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[2.52, 0.03, 16, 32]} />
         <meshBasicMaterial color="#00f3ff" />
       </mesh>
 

@@ -26,9 +26,9 @@ export function SSDModel() {
         <meshStandardMaterial color="#059669" roughness={0.4} />
       </mesh>
       {/* PCB Circuit Traces */}
-      <mesh position={[0, 0.045, 0]}>
-        <planeGeometry args={[2.4, 4.2]} rotation={[-Math.PI / 2, 0, 0]} />
-        <meshBasicMaterial color="#10b981" wireframe transparent opacity={0.3} />
+      <mesh position={[0, 0, -0.05]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[2.4, 4.2]} />
+        <meshStandardMaterial color="#0f172a" roughness={0.7} metalness={0.1} />
       </mesh>
 
       {/* NVMe PCIe Controller Chip & Aluminum Heatsink */}

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Lightbulb, Key, Check, ShieldCheck, Sparkles, Cpu } from 'lucide-react';
+import { MessageSquare, X, Send, Lightbulb, Key, Check, Cpu } from 'lucide-react';
 import { Button } from './ui/Button.tsx';
 import { EagleIcon } from './ui/icons/EagleIcon';
 import {

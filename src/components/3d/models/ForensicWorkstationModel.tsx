@@ -95,8 +95,8 @@ export function ForensicWorkstationModel() {
           <meshStandardMaterial color="#64748b" metalness={0.3} roughness={0.4} />
         </mesh>
         {/* Write-Blocker Status Screen */}
-        <mesh position={[0, 0.15, 0]}>
-          <planeGeometry args={[0.7, 0.35]} rotation={[-Math.PI / 2, 0, 0]} />
+        <mesh position={[0, 0.15, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.7, 0.35]} />
           <meshStandardMaterial color="#00f3ff" emissive="#00f3ff" emissiveIntensity={1.2} />
         </mesh>
         {/* Write-Block Active Status LED */}
@@ -125,8 +125,8 @@ export function ForensicWorkstationModel() {
       </group>
 
       {/* High-Speed PCIe / USB 3.2 Cable Bridge */}
-      <mesh position={[0, -1.05, 0.6]}>
-        <cylinderGeometry args={[0.03, 0.03, 2.4, 16]} rotation={[0, 0, Math.PI / 2]} />
+      <mesh position={[0, -1.05, 0.6]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.03, 0.03, 2.4, 16]} />
         <meshStandardMaterial color="#00f3ff" emissive="#00f3ff" emissiveIntensity={0.6} />
       </mesh>
 
@@ -143,8 +143,8 @@ export function ForensicWorkstationModel() {
           <boxGeometry args={[1.2, 0.05, 0.45]} />
           <meshStandardMaterial color="#1e293b" roughness={0.6} />
         </mesh>
-        <mesh position={[-0.2, 0.03, 0]}>
-          <planeGeometry args={[1.1, 0.38]} rotation={[-Math.PI / 2, 0, 0]} />
+        <mesh position={[-0.2, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[1.1, 0.38]} />
           <meshBasicMaterial color="#38bdf8" />
         </mesh>
         {/* Mouse */}
